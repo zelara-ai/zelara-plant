@@ -39,6 +39,11 @@ Before running the project, ensure you have the following:
    - After making changes, restart the services by right-clicking on `docker-compose.yml` and selecting `Compose Down`, followed by `Compose Up`.
    - Test your changes using tools like `curl` or Postman to send requests to the FastAPI application.
 
+## API Documentation and Resources
+- **KindWise Admin**: Access the KindWise admin portal for managing plant data. [KindWise Admin](https://admin.kindwise.com/)
+- **KindWise Crop API**: Documentation for interacting with crop data and plant care information. [KindWise Crop API](https://crop.kindwise.com/docs)
+- **Plant.id API**: Documentation for plant identification and related API services. [Plant.id API](https://plant.id/docs)
+
 ## Notes
 - **For Developers**: Ensure all changes are tested locally before pushing them to the repository.
 - **For Automation Tools and Bots**: When interacting with this repository, write reusable and consistent code. Output clean, production-ready versions.
