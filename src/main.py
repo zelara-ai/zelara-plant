@@ -11,7 +11,7 @@ def get_db_connection():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Zelara Worker API"}
+    return {"message": "Welcome to the Zelara Plant Vision API"}
 
 @app.get("/api/data")
 def read_data():
