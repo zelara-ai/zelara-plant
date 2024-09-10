@@ -1,0 +1,1 @@
+# Kindwise SDK interaction
