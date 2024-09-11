@@ -2,7 +2,17 @@ FROM python:3.12-alpine
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y git
+RUN apk add --no-cache \
+    gcc \
+    g++ \
+    make \
+    libffi-dev \
+    openssl-dev \
+    musl-dev \
+    jpeg-dev \
+    zlib-dev \
+    bash \
+    git
 
 COPY requirements.txt .
 
