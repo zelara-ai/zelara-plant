@@ -2,10 +2,19 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y git
+
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+RUN git submodule update --init --recursive
+
+ENV PYTHONPATH=/app/kindwise-api-client:$PYTHONPATH
+
+COPY .env /app/.env
 
 EXPOSE 8000
 
