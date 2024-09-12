@@ -117,4 +117,4 @@ def main(directory='.', ignore_submodules=False):
 
 if __name__ == "__main__":
     # Call the main function with directory and submodule ignore flag
-    main(directory='.', ignore_submodules=False)  # Set ignore_submodules=False to include submodules
+    main(directory='.', ignore_submodules=True)  # Set ignore_submodules=False to include submodules

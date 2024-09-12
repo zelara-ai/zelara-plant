@@ -2,28 +2,15 @@ FROM python:3.12-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    gcc \
-    g++ \
-    make \
-    libffi-dev \
-    openssl-dev \
-    musl-dev \
-    jpeg-dev \
-    zlib-dev \
-    bash \
-    git
-
-COPY requirements.txt .
-
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN git submodule update --init --recursive
+RUN apk add --no-cache git && git submodule update --init --recursive
 
-ENV PYTHONPATH=/app/kindwise-api-client:$PYTHONPATH
+ENV PYTHONPATH="/app/kindwise-api-client:$PYTHONPATH"
 
 EXPOSE 8000
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
