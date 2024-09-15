@@ -3,7 +3,7 @@ from src.core.image_processor import process_image
 from src.core.kindwise_wrapper import KindwiseClient
 from src.db.db_service import DatabaseService
 
-def identify_plant_task(file: UploadFile):
+def identify_plant_task(file: UploadFile, api_key=None):
     """
     Background task to process the image and identify the plant.
 
@@ -19,7 +19,7 @@ def identify_plant_task(file: UploadFile):
     processed_image = process_image(file)
 
     # Initialize Kindwise client
-    kindwise_client = KindwiseClient()
+    kindwise_client = KindwiseClient(api_key=api_key)
 
     # Identify the plant
     identification_result = kindwise_client.identify_plant(processed_image)

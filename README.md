@@ -41,6 +41,18 @@ Before running the project, ensure you have the following:
    - After making changes, restart the services by right-clicking on `docker-compose.yml` and selecting `Compose Down`, followed by `Compose Up`.
    - Test your changes using tools like `curl` or Postman to send requests to the FastAPI application.
 
+## Production API Key Usage
+
+In production, you need to provide the API key through the request headers using the `Authorization` header. Example:
+
+- **Authorization Header**: `Bearer your_production_api_key_here`
+
+For example, using Postman or cURL:
+
+   ```
+   Authorization: Bearer your_production_api_key_here
+   ```
+
 ## API Documentation and Resources
 - **KindWise Admin**: Access the KindWise admin portal for managing plant data. [KindWise Admin](https://admin.kindwise.com/)
 - **KindWise Crop API**: Documentation for interacting with crop data and plant care information. [KindWise Crop API](https://crop.kindwise.com/docs)

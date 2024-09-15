@@ -7,7 +7,15 @@ app = FastAPI(
     description="API for plant identification using Kindwise SDK."
 )
 
-# Include the API router
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    if settings.environment == "PRODUCTION":
+        try:
+            api_key = get_api_key_from_headers(request.headers)
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+    return await call_next(request)
+
 app.include_router(router)
 
 @app.get("/")

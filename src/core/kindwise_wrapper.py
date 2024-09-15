@@ -2,14 +2,14 @@ from kindwise.plant import PlantApi
 from src.config import settings
 
 class KindwiseClient:
-    def __init__(self):
+    def __init__(self, api_key=None):
         """
         Initializes the Kindwise API client.
 
         TODO:
             - Configure the Kindwise API client with the API key from settings.
         """
-        self.api = PlantApi(api_key=settings.kindwise_api_key)
+        self.api = PlantApi(api_key=api_key or settings.kindwise_api_key)
 
     def identify_plant(self, image_data: bytes):
         """
