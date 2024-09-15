@@ -4,28 +4,33 @@ from src.config import settings
 class KindwiseClient:
     def __init__(self):
         """
-        Initialize the Kindwise API client.
-        
-        TODO:
-        - Configure the Kindwise API client with the API key.
-        """
-        # TODO: Initialize PlantApi with the API key from settings
-        self.api = None  # Placeholder for Kindwise API client
-
-    def identify_plant(self, image_path: str, lat_lon: tuple = None):
-        """
-        Identify the plant from the given image.
+        Initializes the Kindwise API client.
 
         TODO:
-        - Send image to Kindwise API for plant identificroptation.
-        - Handle errors or retries in case of failures.
-        
-        Placeholder:
-        Returns mock identification data.
+            - Configure the Kindwise API client with the API key from settings.
         """
-        # TODO: Call Kindwise API to identify plant
-        return {
-            "plant_name": "Placeholder Plant",
-            "scientific_name": "Plantae Placeholder",
-            "accuracy": 0.95
-        }
+        self.api = PlantApi(api_key=settings.kindwise_api_key)
+
+    def identify_plant(self, image_data: bytes):
+        """
+        Identifies the plant using the Kindwise API.
+
+        Args:
+            image_data (bytes): The processed image data.
+
+        Returns:
+            dict: The identification result.
+
+        TODO:
+            - Implement error handling.
+            - Parse the API response into a suitable format.
+        """
+        try:
+            # Call the identify method of the Kindwise API
+            result = self.api.identify(images=[image_data])
+            # Process the result as needed
+            return result
+        except Exception as e:
+            # Handle exceptions
+            print(f"Error identifying plant: {e}")
+            return None

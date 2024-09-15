@@ -4,54 +4,65 @@ from src.config import settings
 class DatabaseService:
     def __init__(self):
         """
-        Initialize the database connection.
-        
-        TODO:
-        - Connect to MongoDB for local development.
-        - Support persistent storage for production environments.
+        Initializes the database connection.
+
+        - Connects to MongoDB based on environment settings.
         """
-        # TODO: Setup database connection based on environment
-        if settings.environment == "production":
-            self.client = None  # Production DB
-        else:
-            self.client = None  # Local MongoDB for development
+        self.client = MongoClient(settings.mongo_url)
         self.db = self.client.zelara_db
+        self.collection = self.db.identifications
 
     def save_identification(self, data):
         """
-        Save plant identification data to the database.
-        
+        Saves plant identification data to the database.
+
+        Args:
+            data (dict): The identification result data.
+
         TODO:
-        - Insert the plant identification result into the database.
-        
-        Placeholder:
-        Logs a message as placeholder.
+            - Implement proper data insertion.
+            - Handle duplicates or conflicts.
         """
-        # TODO: Insert data into the MongoDB collection
-        print(f"Saving identification: {data}")
+        try:
+            self.collection.insert_one(data)
+            print("Identification saved to database.")
+        except Exception as e:
+            print(f"Error saving to database: {e}")
 
     def get_identifications(self):
         """
-        Retrieve all plant identifications from the database.
-        
+        Retrieves all plant identifications from the database.
+
+        Returns:
+            list: A list of identification documents.
+
         TODO:
-        - Fetch all identification data from the database.
-        
-        Placeholder:
-        Returns an empty list.
+            - Implement pagination if necessary.
+            - Convert MongoDB documents to suitable response format.
         """
-        # TODO: Fetch data from MongoDB collection
-        return []
-    
+        try:
+            return list(self.collection.find())
+        except Exception as e:
+            print(f"Error fetching identifications: {e}")
+            return []
+
     def get_identification_by_id(self, id: str):
         """
-        Retrieve a specific plant identification by ID.
-        
+        Retrieves a specific plant identification by ID.
+
+        Args:
+            id (str): The identification ID.
+
+        Returns:
+            dict: The identification document.
+
         TODO:
-        - Fetch identification data by ID from the database.
-        
-        Placeholder:
-        Returns a mock identification result.
+            - Implement proper data retrieval.
+            - Handle cases where the ID is not found.
         """
-        # TODO: Fetch data from MongoDB by ID
-        return {"id": id, "plant_name": "Placeholder"}
+        try:
+            from bson.objectid import ObjectId
+            return self.collection.find_one({"_id": ObjectId(id)})
+        except Exception as e:
+            print(f"Error fetching identification by ID: {e}")
+            return None

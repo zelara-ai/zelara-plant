@@ -1,3 +1,3 @@
 [submodule "kindwise-api-client"]
-	path = kindwise-api-client
-	url = https://github.com/flowerchecker/kindwise-api-client.git
+    path = kindwise-api-client
+    url = https://github.com/flowerchecker/kindwise-api-client.git

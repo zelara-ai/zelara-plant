@@ -6,4 +6,4 @@ pillow
 python-dotenv
 pydantic-settings
 requests
-python-multipart 
+python-multipart

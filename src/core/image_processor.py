@@ -4,20 +4,28 @@ from fastapi import UploadFile
 
 def process_image(file: UploadFile) -> bytes:
     """
-    Resize and process the uploaded image.
+    Processes the uploaded image.
+
+    Args:
+        file (UploadFile): The uploaded image file.
+
+    Returns:
+        bytes: The processed image data.
 
     TODO:
-    - Resize the image to Kindwise API specifications.
-    - Convert the image to a format suitable for the API (e.g., base64 or binary).
-    
-    Placeholder:
-    Returns a mock processed image as binary data.
+        - Implement actual image processing logic.
+        - Resize the image according to Kindwise API requirements.
+        - Convert image to required format.
     """
-    # TODO: Add image processing logic (resize, validate format)
-    image = Image.open(file.file)
-    image = image.resize((1500, 1500))  # Example resize logic
-
-    buffer = io.BytesIO()
-    image.save(buffer, format="JPEG")
-    
-    return buffer.getvalue()
+    try:
+        image = Image.open(file.file)
+        # Resize or process the image as needed
+        # For example, resize to a maximum dimension
+        image.thumbnail((1500, 1500))
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG")
+        return buffer.getvalue()
+    except Exception as e:
+        # Handle exceptions, possibly log the error
+        print(f"Error processing image: {e}")
+        return None

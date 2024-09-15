@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from src.api.routes import router
 
-app = FastAPI()
+app = FastAPI(
+    title="Zelara Plant Worker",
+    version="0.1.0",
+    description="API for plant identification using Kindwise SDK."
+)
 
 # Include the API router
 app.include_router(router)
@@ -10,8 +14,8 @@ app.include_router(router)
 async def root():
     """
     Root endpoint for health check.
-    
-    Placeholder:
-    Returns a welcome message.
+
+    Returns:
+        dict: Welcome message.
     """
-    return {"message": "Zelara Plant Worker API"}
+    return {"message": "Welcome to the Zelara Plant Worker API"}

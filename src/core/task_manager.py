@@ -3,27 +3,29 @@ from src.core.image_processor import process_image
 from src.core.kindwise_wrapper import KindwiseClient
 from src.db.db_service import DatabaseService
 
-async def identify_plant_task(file: UploadFile):
+def identify_plant_task(file: UploadFile):
     """
-    Background task to identify the plant from the uploaded image.
-    
+    Background task to process the image and identify the plant.
+
+    Args:
+        file (UploadFile): The uploaded image file.
+
     TODO:
-    - Process the image.
-    - Call Kindwise SDK to identify the plant.
-    - Store the result in the database.
-    
-    Placeholder:
-    Currently just a log statement.
+        - Implement image processing.
+        - Integrate Kindwise SDK for plant identification.
+        - Implement database storage of results.
     """
-    # TODO: Initialize Kindwise client and database service
-    # kindwise_client = KindwiseClient()
-    # db_service = DatabaseService()
-
-    # TODO: Process image and identify plant
+    # Process the image
     processed_image = process_image(file)
-    
-    # TODO: Call Kindwise SDK and save result to database
-    # identification = kindwise_client.identify_plant(processed_image)
-    # db_service.save_identification(identification)
 
-    print("Image processed and task completed (placeholder).")
+    # Initialize Kindwise client
+    kindwise_client = KindwiseClient()
+
+    # Identify the plant
+    identification_result = kindwise_client.identify_plant(processed_image)
+
+    # Store the result in the database
+    db_service = DatabaseService()
+    db_service.save_identification(identification_result)
+
+    print("Plant identification task completed.")

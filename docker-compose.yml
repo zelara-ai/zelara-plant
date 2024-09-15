@@ -3,11 +3,10 @@ services:
     image: mongo:5.0.12
     container_name: zelara-db
     ports:
-     - "4002:27017"
+      - "4002:27017"
     restart: always
 
   db-fixtures:
-    image: db-fixtures
     build: ./db-fixtures
     container_name: db-fixtures
     depends_on:
