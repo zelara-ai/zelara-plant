@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
+from src.config import settings, get_api_key_from_headers
 from src.api.routes import router
 
 app = FastAPI(

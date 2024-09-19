@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 from src.config import settings
+from bson.objectid import ObjectId
+
 
 class DatabaseService:
     def __init__(self):
@@ -12,22 +14,53 @@ class DatabaseService:
         self.db = self.client.zelara_db
         self.collection = self.db.identifications
 
-    def save_identification(self, data):
+    def create_identification_record(self, status: str = "Processing"):
         """
-        Saves plant identification data to the database.
+        Creates a new identification record in the database.
 
         Args:
-            data (dict): The identification result data.
+            status (str): The initial status of the identification.
 
-        TODO:
-            - Implement proper data insertion.
-            - Handle duplicates or conflicts.
+        Returns:
+            str: The ID of the new identification record.
+        """
+        identification = {"status": status}
+        result = self.collection.insert_one(identification)
+        return result.inserted_id
+
+    def update_identification(self, identification_id: str, data: dict):
+        """
+        Updates an existing identification record with the result data.
+
+        Args:
+            identification_id (str): The ID of the identification record.
+            data (dict): The identification result data.
         """
         try:
-            self.collection.insert_one(data)
-            print("Identification saved to database.")
+            self.collection.update_one(
+                {"_id": ObjectId(identification_id)},
+                {"$set": {"status": "Completed", "result": data}},
+            )
+            print("Identification updated in database.")
         except Exception as e:
-            print(f"Error saving to database: {e}")
+            print(f"Error updating database: {e}")
+
+    def update_identification_error(self, identification_id: str, error_message: str):
+        """
+        Updates an existing identification record with an error status.
+
+        Args:
+            identification_id (str): The ID of the identification record.
+            error_message (str): The error message.
+        """
+        try:
+            self.collection.update_one(
+                {"_id": ObjectId(identification_id)},
+                {"$set": {"status": "Error", "error_message": error_message}},
+            )
+            print("Identification error updated in database.")
+        except Exception as e:
+            print(f"Error updating database with error: {e}")
 
     def get_identifications(self):
         """
@@ -35,13 +68,10 @@ class DatabaseService:
 
         Returns:
             list: A list of identification documents.
-
-        TODO:
-            - Implement pagination if necessary.
-            - Convert MongoDB documents to suitable response format.
         """
         try:
-            return list(self.collection.find())
+            identifications = self.collection.find()
+            return [self._serialize_identification(ident) for ident in identifications]
         except Exception as e:
             print(f"Error fetching identifications: {e}")
             return []
@@ -55,14 +85,26 @@ class DatabaseService:
 
         Returns:
             dict: The identification document.
-
-        TODO:
-            - Implement proper data retrieval.
-            - Handle cases where the ID is not found.
         """
         try:
-            from bson.objectid import ObjectId
-            return self.collection.find_one({"_id": ObjectId(id)})
+            identification = self.collection.find_one({"_id": ObjectId(id)})
+            if identification:
+                return self._serialize_identification(identification)
+            else:
+                return None
         except Exception as e:
             print(f"Error fetching identification by ID: {e}")
             return None
+
+    def _serialize_identification(self, identification):
+        """
+        Serializes the identification document for JSON response.
+
+        Args:
+            identification (dict): The identification document.
+
+        Returns:
+            dict: The serialized identification.
+        """
+        identification["_id"] = str(identification["_id"])
+        return identification

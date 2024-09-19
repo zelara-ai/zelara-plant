@@ -1,13 +1,11 @@
-from kindwise.plant import PlantApi
+from kindwise.plant import PlantApi, PlantIdentification
 from src.config import settings
+
 
 class KindwiseClient:
     def __init__(self, api_key=None):
         """
         Initializes the Kindwise API client.
-
-        TODO:
-            - Configure the Kindwise API client with the API key from settings.
         """
         self.api = PlantApi(api_key=api_key or settings.kindwise_api_key)
 
@@ -21,16 +19,19 @@ class KindwiseClient:
         Returns:
             dict: The identification result.
 
-        TODO:
-            - Implement error handling.
-            - Parse the API response into a suitable format.
+        Raises:
+            Exception: If identification fails.
         """
         try:
             # Call the identify method of the Kindwise API
-            result = self.api.identify(images=[image_data])
-            # Process the result as needed
-            return result
+            result: PlantIdentification = self.api.identify(
+                image=[image_data],
+                details=["common_names", "taxonomy", "classification"],
+                similar_images=False,
+            )
+            # Return the result as a dictionary
+            return result.dict()
         except Exception as e:
             # Handle exceptions
             print(f"Error identifying plant: {e}")
-            return None
+            raise e

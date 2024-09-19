@@ -1,31 +1,32 @@
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
-from fastapi import UploadFile
 
-def process_image(file: UploadFile) -> bytes:
+
+def process_image(file_contents: bytes) -> bytes:
     """
     Processes the uploaded image.
 
     Args:
-        file (UploadFile): The uploaded image file.
+        file_contents (bytes): The uploaded image data.
 
     Returns:
         bytes: The processed image data.
 
-    TODO:
-        - Implement actual image processing logic.
-        - Resize the image according to Kindwise API requirements.
-        - Convert image to required format.
+    Raises:
+        ValueError: If the image cannot be processed.
     """
     try:
-        image = Image.open(file.file)
-        # Resize or process the image as needed
-        # For example, resize to a maximum dimension
-        image.thumbnail((1500, 1500))
+        image = Image.open(io.BytesIO(file_contents))
+        image = image.convert("RGB")  # Ensure image is in RGB mode
+        # Resize the image to a maximum dimension if necessary
+        max_size = (1500, 1500)
+        image.thumbnail(max_size, Image.Resampling.LANCZOS)
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG")
         return buffer.getvalue()
+    except UnidentifiedImageError:
+        raise ValueError("Uploaded file is not a valid image.")
     except Exception as e:
-        # Handle exceptions, possibly log the error
+        # Handle other exceptions, possibly log the error
         print(f"Error processing image: {e}")
-        return None
+        raise ValueError("Error processing image.")

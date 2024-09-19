@@ -20,7 +20,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      KINDWISE_API_KEY: your_kindwise_api_key_here
       MONGO_URL: mongodb://db:27017/zelara_db
       ENVIRONMENT: LOCAL
     depends_on:

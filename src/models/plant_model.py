@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional, Any
+
 
 class PlantIdentificationResponse(BaseModel):
     """
@@ -6,14 +8,25 @@ class PlantIdentificationResponse(BaseModel):
 
     Attributes:
         message (str): Response message.
-        plant_name (str): Common name of the plant.
-        scientific_name (str): Scientific name of the plant.
-        accuracy (float): Confidence level of the identification.
-
-    TODO:
-        - Add more fields as required by the identification result.
+        identification_id (str): The ID of the identification task.
     """
+
     message: str
-    plant_name: str = None
-    scientific_name: str = None
-    accuracy: float = None
+    identification_id: str
+
+
+class PlantIdentificationResult(BaseModel):
+    """
+    Model for the plant identification result.
+
+    Attributes:
+        id (str): The identification ID.
+        status (str): The status of the identification ('Processing', 'Completed', 'Error').
+        result (Optional[Any]): The identification result data.
+        error_message (Optional[str]): Error message if any.
+    """
+
+    id: str = Field(alias="_id")
+    status: str
+    result: Optional[Any] = None
+    error_message: Optional[str] = None
