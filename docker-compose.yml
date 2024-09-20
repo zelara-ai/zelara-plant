@@ -25,3 +25,15 @@ services:
     depends_on:
       - db
     restart: always
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile-test
+    container_name: zelara-test
+    environment:
+      MONGO_URL: mongodb://db:27017/zelara_db
+      ENVIRONMENT: LOCAL
+      PYTHONPATH: /app
+    depends_on:
+      - db

@@ -1,15 +1,20 @@
 import os
 import json
 import fnmatch
+import mimetypes
 
 def read_file(file_path):
-    """Reads a file and returns its content with backticks escaped."""
+    """Reads a file and returns its content with backticks escaped, or '...' for binary files."""
     try:
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type and mime_type.startswith('image'):
+            return "..."
+        
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
             return content.replace('`', '~')
-    except UnicodeDecodeError:
-        return None
+    except (UnicodeDecodeError, FileNotFoundError):
+        return "..."
 
 def parse_gitignore(gitignore_path):
     """Parses a .gitignore file and returns a list of ignore patterns."""
@@ -76,8 +81,7 @@ def dir_to_json(directory, submodules, ignore_submodules=False):
                 continue
 
             file_content = read_file(file_path)
-            if file_content is not None:
-                sub_result[file] = file_content
+            sub_result[file] = file_content
 
     return result
 

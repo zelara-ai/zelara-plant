@@ -9,8 +9,10 @@ from fastapi import (
 from typing import List
 from src.core.task_manager import identify_plant_task
 from src.models.plant_model import PlantIdentificationResponse, PlantIdentificationResult
+from src.models.image_request import ImageUploadRequest
 from src.db.db_service import DatabaseService
 from src.config import settings, get_api_key_from_headers
+import base64
 
 router = APIRouter()
 
@@ -53,6 +55,63 @@ async def identify_plant(
     if not file_contents:
         raise HTTPException(status_code=400, detail="Empty file.")
 
+    # Start the identification task
+    return await start_identification_task(background_tasks, file_contents, api_key)
+
+
+@router.post("/identify_base64", response_model=PlantIdentificationResponse)
+async def identify_plant_base64(
+    background_tasks: BackgroundTasks,
+    image_request: ImageUploadRequest,
+    request: Request = None,
+):
+    """
+    Endpoint to upload a base64-encoded image for plant identification.
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI background tasks.
+        image_request (ImageUploadRequest): The request containing the base64 image.
+        request (Request): The incoming request.
+
+    Returns:
+        PlantIdentificationResponse: The response containing the task ID.
+
+    Raises:
+        HTTPException: If the base64-encoded image is invalid.
+    """
+    # Extract API key from headers if in PRODUCTION environment
+    api_key = settings.kindwise_api_key
+    if settings.environment == "PRODUCTION":
+        try:
+            api_key = get_api_key_from_headers(request.headers)
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+
+    # Decode the base64-encoded image
+    try:
+        image_data = base64.b64decode(image_request.image_base64)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid base64-encoded image.")
+
+    if not image_data:
+        raise HTTPException(status_code=400, detail="Empty image data.")
+
+    # Start the identification task
+    return await start_identification_task(background_tasks, image_data, api_key)
+
+
+async def start_identification_task(background_tasks: BackgroundTasks, image_data: bytes, api_key: str):
+    """
+    Helper function to start the plant identification background task.
+
+    Args:
+        background_tasks (BackgroundTasks): FastAPI background tasks.
+        image_data (bytes): The image data.
+        api_key (str): The API key for Kindwise.
+
+    Returns:
+        PlantIdentificationResponse: The response containing the task ID.
+    """
     # Initialize database service
     db_service = DatabaseService()
 
@@ -61,7 +120,7 @@ async def identify_plant(
 
     # Submit the background task with the appropriate API key and identification ID
     background_tasks.add_task(
-        identify_plant_task, file_contents, api_key, identification_id
+        identify_plant_task, image_data, api_key, identification_id
     )
 
     return PlantIdentificationResponse(
