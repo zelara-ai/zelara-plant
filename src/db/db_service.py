@@ -26,7 +26,7 @@ class DatabaseService:
         """
         identification = {"status": status}
         result = self.collection.insert_one(identification)
-        return result.inserted_id
+        return str(result.inserted_id)
 
     def update_identification(self, identification_id: str, data: dict):
         """

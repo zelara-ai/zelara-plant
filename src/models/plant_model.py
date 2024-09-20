@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Any
+from typing import Optional, List, Dict
 
 
 class PlantIdentificationResponse(BaseModel):
@@ -22,11 +22,24 @@ class PlantIdentificationResult(BaseModel):
     Attributes:
         id (str): The identification ID.
         status (str): The status of the identification ('Processing', 'Completed', 'Error').
-        result (Optional[Any]): The identification result data.
+        result (Optional[PlantResult]): The identification result data.
         error_message (Optional[str]): Error message if any.
     """
 
     id: str = Field(alias="_id")
     status: str
-    result: Optional[Any] = None
+    result: Optional["PlantResult"] = None
     error_message: Optional[str] = None
+
+
+class PlantResult(BaseModel):
+    plant_name: Optional[str]
+    common_names: Optional[List[str]]
+    probability: Optional[float]
+    taxonomy: Optional[Dict[str, str]]
+    identification_id: Optional[str]
+    is_plant: Optional[bool]
+    created: Optional[str]
+
+
+PlantIdentificationResult.update_forward_refs()
