@@ -4,7 +4,7 @@ from src.api.routes import router
 
 app = FastAPI(
     title="Zelara Plant Worker",
-    version="0.1.0",
+    version="1.0.0",
     description="API for plant identification using Kindwise SDK."
 )
 
