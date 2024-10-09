@@ -2,12 +2,14 @@ FROM python:3.12-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache git gcc musl-dev libjpeg-turbo-dev zlib-dev
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN apk add --no-cache git && git submodule update --init --recursive
+RUN git submodule update --init --recursive
 
 ENV PYTHONPATH="/app/kindwise-api-client:$PYTHONPATH"
 

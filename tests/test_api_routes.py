@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
 import sys
 
+# Mock external dependencies
 sys.modules['kindwise'] = MagicMock()
 sys.modules['kindwise.plant'] = MagicMock()
 
@@ -159,3 +160,46 @@ def test_get_identification_by_id_not_found(mock_db_service):
     assert response.status_code == 404
     data = response.json()
     assert data['detail'] == 'Identification not found.'
+
+# New Tests for Authentication Handling
+
+def test_identify_plant_missing_api_key(mock_db_service, mock_identify_plant_task):
+    mock_db_service.create_identification_record.return_value = '12345'
+
+    # Simulate uploading a valid image without API key in PRODUCTION
+    settings.environment = "PRODUCTION"
+    with open('tests/ficus_lyrata_1152x1536.jpg', 'rb') as img_file:
+        response = client.post(
+            '/identify',
+            files={'file': ('ficus.jpg', img_file, 'image/jpeg')}
+            # No Authorization header provided
+        )
+
+    assert response.status_code == 401
+    data = response.json()
+    assert data['detail'] == 'API key not found in headers. Please provide the key in Authorization header.'
+
+def test_identify_plant_invalid_api_key(mock_db_service, mock_identify_plant_task, mock_get_api_key_from_headers):
+    mock_get_api_key_from_headers.return_value = 'invalid-api-key'
+    mock_db_service.create_identification_record.return_value = '12345'
+
+    # Simulate uploading a valid image with an invalid API key in PRODUCTION
+    settings.environment = "PRODUCTION"
+    with open('tests/ficus_lyrata_1152x1536.jpg', 'rb') as img_file:
+        # Assuming that identify_plant_task raises an exception for invalid API keys
+        mock_identify_plant_task.side_effect = Exception("Invalid API key")
+
+        response = client.post(
+            '/identify',
+            files={'file': ('ficus.jpg', img_file, 'image/jpeg')},
+            headers={'Authorization': 'Bearer invalid-api-key'}
+        )
+
+    assert response.status_code == 200  # The endpoint itself accepts the request and processes in background
+    data = response.json()
+    assert data['message'] == 'Plant identification is in progress.'
+    assert data['identification_id'] == '12345'
+
+    # Ensure the background task was added
+    mock_identify_plant_task.assert_called_once()
+    mock_db_service.create_identification_record.assert_called_once_with(status='Processing')

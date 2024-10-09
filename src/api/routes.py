@@ -16,7 +16,6 @@ import base64
 
 router = APIRouter()
 
-
 @router.post("/identify", response_model=PlantIdentificationResponse)
 async def identify_plant(
     background_tasks: BackgroundTasks,
@@ -35,7 +34,7 @@ async def identify_plant(
         PlantIdentificationResponse: The response containing the task ID.
 
     Raises:
-        HTTPException: If the uploaded file is not an image.
+        HTTPException: If the uploaded file is not an image or authentication fails.
     """
     if not file.content_type.startswith("image/"):
         raise HTTPException(
@@ -58,7 +57,6 @@ async def identify_plant(
     # Start the identification task
     return await start_identification_task(background_tasks, file_contents, api_key)
 
-
 @router.post("/identify_base64", response_model=PlantIdentificationResponse)
 async def identify_plant_base64(
     background_tasks: BackgroundTasks,
@@ -77,7 +75,7 @@ async def identify_plant_base64(
         PlantIdentificationResponse: The response containing the task ID.
 
     Raises:
-        HTTPException: If the base64-encoded image is invalid.
+        HTTPException: If the base64-encoded image is invalid or authentication fails.
     """
     # Extract API key from headers if in PRODUCTION environment
     api_key = settings.kindwise_api_key
@@ -98,7 +96,6 @@ async def identify_plant_base64(
 
     # Start the identification task
     return await start_identification_task(background_tasks, image_data, api_key)
-
 
 async def start_identification_task(background_tasks: BackgroundTasks, image_data: bytes, api_key: str):
     """
@@ -128,7 +125,6 @@ async def start_identification_task(background_tasks: BackgroundTasks, image_dat
         identification_id=str(identification_id),
     )
 
-
 @router.get("/identifications", response_model=List[PlantIdentificationResult])
 async def get_all_identifications():
     """
@@ -140,7 +136,6 @@ async def get_all_identifications():
     db_service = DatabaseService()
     identifications = db_service.get_identifications()
     return identifications
-
 
 @router.get("/identifications/{id}", response_model=PlantIdentificationResult)
 async def get_identification_by_id(id: str):
