@@ -1,25 +1,30 @@
-from pymongo import MongoClient
-from fastapi import FastAPI, HTTPException
-import os
+from fastapi import FastAPI, Request, HTTPException
+from src.config import settings, get_api_key_from_headers
+from src.api.routes import router
 
-app = FastAPI()
+app = FastAPI(
+    title="Zelara Plant Worker",
+    version="1.0.0",
+    description="API for plant identification using Kindwise SDK."
+)
 
-def get_db_connection():
-    client = MongoClient(os.getenv("MONGO_URL"))
-    db = client.zelara_db
-    return db
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    if settings.environment == "PRODUCTION":
+        try:
+            api_key = get_api_key_from_headers(request.headers)
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+    return await call_next(request)
+
+app.include_router(router)
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to the Zelara Worker API"}
+async def root():
+    """
+    Root endpoint for health check.
 
-@app.get("/api/data")
-def read_data():
-    db = get_db_connection()
-    collection = db["mycollection"]
-    rows = list(collection.find({}, {"_id": 0}))
-
-    if not rows:
-        raise HTTPException(status_code=404, detail="No data found")
-
-    return {"data": rows}
+    Returns:
+        dict: Welcome message.
+    """
+    return {"message": "Welcome to the Zelara Plant Worker API"}

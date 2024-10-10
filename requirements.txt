@@ -2,3 +2,8 @@ fastapi
 uvicorn
 pymongo
 pydantic
+pillow>10.0.0
+python-dotenv
+pydantic-settings
+requests
+python-multipart
